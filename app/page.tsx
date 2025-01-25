@@ -1,127 +1,44 @@
-// app/plan/page.tsx
+// app/page.tsx
 
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 
-export default function Plan() {
-  const [formData, setFormData] = useState({
-    destinations: "",
-    travelTime: "",
-    budget: "",
-    tripType: "",
-    activities: "",
-  });
-
-  const router = useRouter();
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // For now, log the form data to the console
-    console.log("Form Data Submitted:", formData);
-    // Later, navigate to recommendations or process data
-  };
-
+export default function Home() {
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen p-8 bg-white dark:bg-gray-900">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
-        Plan Your Trip
-      </h1>
-      <form onSubmit={handleSubmit} className="w-full max-w-md">
-        {/* Destinations Input */}
-        <div className="mb-4">
-          <label htmlFor="destinations" className="block text-gray-700 dark:text-gray-300 mb-2">
-            Destinations:
-          </label>
-          <input
-            type="text"
-            name="destinations"
-            id="destinations"
-            value={formData.destinations}
-            onChange={handleChange}
-            placeholder="e.g., Europe, Asia, or leave blank"
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-500"
-          />
-        </div>
-        {/* Travel Time Input */}
-        <div className="mb-4">
-          <label htmlFor="travelTime" className="block text-gray-700 dark:text-gray-300 mb-2">
-            Travel Time (in days):
-          </label>
-          <input
-            type="number"
-            name="travelTime"
-            id="travelTime"
-            value={formData.travelTime}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-500"
-          />
-        </div>
-        {/* Budget Input */}
-        <div className="mb-4">
-          <label htmlFor="budget" className="block text-gray-700 dark:text-gray-300 mb-2">
-            Budget (in your currency):
-          </label>
-          <input
-            type="number"
-            name="budget"
-            id="budget"
-            value={formData.budget}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-500"
-          />
-        </div>
-        {/* Trip Type Select */}
-        <div className="mb-4">
-          <label htmlFor="tripType" className="block text-gray-700 dark:text-gray-300 mb-2">
-            Trip Type:
-          </label>
-          <select
-            name="tripType"
-            id="tripType"
-            value={formData.tripType}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-500"
-          >
-            <option value="">Select one</option>
-            <option value="relaxing">Relaxing</option>
-            <option value="activities">Activities</option>
-            <option value="backpacking">Backpacking</option>
-            <option value="sightseeing">Sightseeing</option>
-          </select>
-        </div>
-        {/* Activities Input */}
-        <div className="mb-6">
-          <label htmlFor="activities" className="block text-gray-700 dark:text-gray-300 mb-2">
-            Preferred Activities:
-          </label>
-          <input
-            type="text"
-            name="activities"
-            id="activities"
-            value={formData.activities}
-            onChange={handleChange}
-            placeholder="e.g., hiking, beach, culture"
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-500"
-          />
-        </div>
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
-        >
-          Get Recommendations
-        </button>
-      </form>
+    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+      {/* Hero Section */}
+      <div className="text-center px-4 sm:px-0">
+        <h1 className="text-5xl sm:text-6xl font-bold mb-6">
+          Discover Your Next Adventure
+        </h1>
+        <p className="text-lg sm:text-xl mb-10 max-w-2xl mx-auto">
+          Plan your perfect trip with our AI-powered travel planner. Get
+          personalized recommendations tailored to your preferences.
+        </p>
+        <Link href="/plan">
+          <button className="px-8 py-4 bg-white text-blue-600 font-semibold rounded-full shadow-lg hover:bg-gray-100 transition duration-300">
+            Start Planning
+          </button>
+        </Link>
+      </div>
+
+      {/* Decorative Image */}
+      <div className="mt-16">
+        <Image
+          src="/world-map.jpeg"
+          alt="World Map"
+          width={600}
+          height={400}
+          className="opacity-80"
+        />
+      </div>
+
+      {/* Footer */}
+      <footer className="absolute bottom-4 text-center text-sm">
+        © {new Date().getFullYear()} Travel Planner App. All rights reserved.
+      </footer>
     </main>
   );
 }

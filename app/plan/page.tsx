@@ -4,6 +4,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Plan() {
   const [formData, setFormData] = useState({
@@ -16,7 +17,9 @@ export default function Plan() {
 
   const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -26,20 +29,25 @@ export default function Plan() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, log the form data to the console
-    console.log("Form Data Submitted:", formData);
-    // Later, navigate to recommendations or process data
+    console.log("Redirecting to /recommendations");
+    router.push("/recommendations");
   };
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen p-8 bg-white dark:bg-gray-900">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
+    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 text-white p-8">
+      {/* Heading */}
+      <h1 className="text-4xl sm:text-5xl font-bold mb-6 text-center">
         Plan Your Trip
       </h1>
-      <form onSubmit={handleSubmit} className="w-full max-w-md">
+
+      {/* Form */}
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md bg-white rounded-lg p-8 shadow-lg text-gray-800"
+      >
         {/* Destinations Input */}
         <div className="mb-4">
-          <label htmlFor="destinations" className="block text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="destinations" className="block font-semibold mb-2">
             Destinations:
           </label>
           <input
@@ -52,9 +60,10 @@ export default function Plan() {
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-500"
           />
         </div>
+
         {/* Travel Time Input */}
         <div className="mb-4">
-          <label htmlFor="travelTime" className="block text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="travelTime" className="block font-semibold mb-2">
             Travel Time (in days):
           </label>
           <input
@@ -66,9 +75,10 @@ export default function Plan() {
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-500"
           />
         </div>
+
         {/* Budget Input */}
         <div className="mb-4">
-          <label htmlFor="budget" className="block text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="budget" className="block font-semibold mb-2">
             Budget (in your currency):
           </label>
           <input
@@ -80,9 +90,10 @@ export default function Plan() {
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-500"
           />
         </div>
+
         {/* Trip Type Select */}
         <div className="mb-4">
-          <label htmlFor="tripType" className="block text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="tripType" className="block font-semibold mb-2">
             Trip Type:
           </label>
           <select
@@ -90,7 +101,7 @@ export default function Plan() {
             id="tripType"
             value={formData.tripType}
             onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-500"
+            className="w-full px-3 py-2 border rounded-md bg-white focus:outline-none focus:ring focus:border-blue-500"
           >
             <option value="">Select one</option>
             <option value="relaxing">Relaxing</option>
@@ -99,9 +110,10 @@ export default function Plan() {
             <option value="sightseeing">Sightseeing</option>
           </select>
         </div>
+
         {/* Activities Input */}
         <div className="mb-6">
-          <label htmlFor="activities" className="block text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="activities" className="block font-semibold mb-2">
             Preferred Activities:
           </label>
           <input
@@ -114,13 +126,21 @@ export default function Plan() {
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-500"
           />
         </div>
+
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
+          className="w-full py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none transition duration-300"
         >
           Get Recommendations
         </button>
+
+        {/* Back to Homepage Link */}
+        <p className="mt-4 text-center">
+          <Link href="/" className="text-blue-600 hover:underline">
+            Back to Homepage
+          </Link>
+        </p>
       </form>
     </main>
   );
