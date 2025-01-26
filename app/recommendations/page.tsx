@@ -1,16 +1,18 @@
-// app/recommendations/page.tsx
-
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { FormDataContext } from "../context/FormDataContext";
 
 export default function Recommendations() {
   const router = useRouter();
-  const [recommendations, setRecommendations] = useState([]);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // You might have passed the form data via query parameters or context
-  // For now, we'll assume the form data is not directly accessible
+  const formDataContext = useContext(FormDataContext);
+  const formData = formDataContext ? formDataContext.formData : null;
 
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -22,14 +24,7 @@ export default function Recommendations() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-              // Provide sample data or retrieve formData from context or storage
-              destinations: "Europe",
-              travelTime: 7,
-              budget: 2000,
-              tripType: "relaxing",
-              activities: "beach, culture",
-            }),
+            body: JSON.stringify(formData),
           }
         );
 
@@ -39,20 +34,30 @@ export default function Recommendations() {
 
         const data = await response.json();
         setRecommendations(data);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching recommendations:", error);
+        setError("Failed to fetch recommendations. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchRecommendations();
-  }, []);
+  }, [formData]);
 
   return (
     <main className="flex flex-col items-center min-h-screen p-8 bg-white dark:bg-gray-900">
       <h1 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
         Your Travel Recommendations
       </h1>
-      {recommendations.length > 0 ? (
+
+      {loading ? (
+        <p className="mt-4 text-gray-700 dark:text-gray-300">
+          Loading recommendations...
+        </p>
+      ) : error ? (
+        <p className="mt-4 text-red-600 dark:text-red-400">{error}</p>
+      ) : recommendations.length > 0 ? (
         <ul className="mt-4 space-y-4">
           {recommendations.map((item, index) => (
             <li
@@ -70,9 +75,10 @@ export default function Recommendations() {
         </ul>
       ) : (
         <p className="mt-4 text-gray-700 dark:text-gray-300">
-          Loading recommendations...
+          No recommendations found.
         </p>
       )}
+
       <button
         onClick={() => router.push("/plan")}
         className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"

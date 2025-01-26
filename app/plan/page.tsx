@@ -1,19 +1,18 @@
 // app/plan/page.tsx
 
 "use client";
-
-import { useState } from "react";
+import { useContext } from "react";
+import { FormDataContext } from "../context/FormDataContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function Plan() {
-  const [formData, setFormData] = useState({
-    destinations: "",
-    travelTime: "",
-    budget: "",
-    tripType: "",
-    activities: "",
-  });
+  //not sure here
+  const context = useContext(FormDataContext);
+  if (!context) {
+    throw new Error("FormDataContext must be used within a FormDataProvider");
+  }
+  const { formData, setFormData } = context;
 
   const router = useRouter();
 
