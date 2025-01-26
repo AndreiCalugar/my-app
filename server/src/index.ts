@@ -1,6 +1,10 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import recommendationsRouter from "./routes/recommendations";
+import dotenv from "dotenv";
+
+dotenv.config({ path: "./.env" });
+console.log("Loaded OpenAI API Key:", process.env.OPENAI_API_KEY);
 
 const app = express();
 const port = process.env.PORT || 5000;

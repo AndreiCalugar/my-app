@@ -1,13 +1,16 @@
 // app/recommendations/page.tsx
 
 "use client";
+import { useContext, useEffect, useState } from "react";
+import { FormDataContext } from "../context/FormDataContext";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 export default function Recommendations() {
   const router = useRouter();
   const [recommendations, setRecommendations] = useState([]);
+  const formDataContext = useContext(FormDataContext);
+  const formData = formDataContext ? formDataContext.formData : null;
 
   // You might have passed the form data via query parameters or context
   // For now, we'll assume the form data is not directly accessible
@@ -22,14 +25,7 @@ export default function Recommendations() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-              // Provide sample data or retrieve formData from context or storage
-              destinations: "Europe",
-              travelTime: 7,
-              budget: 2000,
-              tripType: "relaxing",
-              activities: "beach, culture",
-            }),
+            body: JSON.stringify(formData),
           }
         );
 

@@ -2,18 +2,13 @@
 
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { FormDataContext } from "../context/FormDataContext";
 import Link from "next/link";
 
 export default function Plan() {
-  const [formData, setFormData] = useState({
-    destinations: "",
-    travelTime: "",
-    budget: "",
-    tripType: "",
-    activities: "",
-  });
+  const { formData, setFormData } = useContext(FormDataContext);
 
   const router = useRouter();
 
@@ -21,7 +16,7 @@ export default function Plan() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
+    setFormData((prevData: any) => ({
       ...prevData,
       [name]: value,
     }));
