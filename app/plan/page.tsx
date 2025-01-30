@@ -5,8 +5,13 @@ import { useContext } from "react";
 import { FormDataContext } from "../context/FormDataContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
 
 export default function Plan() {
+  const {
+    register,
+    formState: { errors },
+  } = useForm();
   //not sure here
   const context = useContext(FormDataContext);
   if (!context) {
@@ -46,18 +51,43 @@ export default function Plan() {
       >
         {/* Destinations Input */}
         <div className="mb-4">
-          <label htmlFor="destinations" className="block font-semibold mb-2">
+          <label
+            htmlFor="destinations"
+            className="block text-gray-700 font-semibold mb-2"
+          >
             Destinations:
           </label>
-          <input
-            type="text"
-            name="destinations"
-            id="destinations"
-            value={formData.destinations}
-            onChange={handleChange}
-            placeholder="e.g., Europe, Asia, or leave blank"
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-500"
-          />
+          <div className="relative">
+            <input
+              type="text"
+              id="destinations"
+              {...register("destinations", {
+                required: "This field is required",
+              })}
+              name="destinations"
+              value={formData.destinations}
+              onChange={handleChange}
+              placeholder="e.g., Europe, Asia, or leave blank"
+              className="w-full pl-12 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+              {/* Example icon */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                {/* Icon path */}
+              </svg>
+            </div>
+          </div>
+          {errors.destinations && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.destinations?.message?.toString()}
+            </p>
+          )}
         </div>
 
         {/* Travel Time Input */}
