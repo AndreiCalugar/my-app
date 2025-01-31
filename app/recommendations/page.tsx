@@ -3,15 +3,19 @@
 import { useContext, useEffect, useState } from "react";
 import { FormDataContext } from "../context/FormDataContext";
 import Link from "next/link";
+import Itinerary from "../components/Itinerary";
 
 interface Recommendation {
-  destination: string;
-  description: string;
+  overview: string;
+  dailyPlan: any[]; // Update this type based on your actual data structure
+  totalCost: string;
 }
 
 export default function Recommendations() {
   const context = useContext(FormDataContext);
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [recommendations, setRecommendations] = useState<Recommendation | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +43,10 @@ export default function Recommendations() {
         }
 
         const data = await response.json();
-        setRecommendations(data);
+        setRecommendations({
+          ...data,
+          totalCost: data.totalCost.toString(),
+        });
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
@@ -61,9 +68,7 @@ export default function Recommendations() {
       {isLoading && (
         <div className="w-full max-w-6xl text-center p-8">
           <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white mx-auto"></div>
-          <p className="mt-4 text-xl">
-            Generating your perfect travel recommendations...
-          </p>
+          <p className="mt-4 text-xl">Creating your perfect itinerary...</p>
         </div>
       )}
 
@@ -75,67 +80,12 @@ export default function Recommendations() {
       )}
 
       {/* Recommendations Grid */}
-      {!isLoading && !error && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
-          {recommendations.map((rec, index) => (
-            <div
-              key={index}
-              className="bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105 flex flex-col h-full"
-            >
-              {/* Card Header */}
-              <div className="bg-blue-600 p-4">
-                <h2 className="text-2xl font-bold text-white">
-                  {rec.destination}
-                </h2>
-              </div>
-
-              {/* Card Content */}
-              <div className="p-6 flex-grow">
-                <p className="text-gray-600">{rec.description}</p>
-              </div>
-
-              {/* Card Footer - Now fixed at bottom */}
-              <div className="bg-gray-50 p-4 mt-auto border-t border-gray-200">
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="flex items-center">
-                    <svg
-                      className="w-4 h-4 text-blue-500 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <span className="text-gray-600">
-                      {formData.travelTime} days
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <svg
-                      className="w-4 h-4 text-blue-500 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <span className="text-gray-600">${formData.budget}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+      {!isLoading && !error && recommendations && (
+        <Itinerary
+          overview={recommendations.overview}
+          dailyPlan={recommendations.dailyPlan}
+          totalCost={recommendations.totalCost}
+        />
       )}
 
       {/* Travel Tips Section */}

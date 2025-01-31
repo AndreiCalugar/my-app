@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { FormDataProvider } from "./context/FormDataContext";
+import "leaflet/dist/leaflet.css";
 
 import "./globals.css";
 

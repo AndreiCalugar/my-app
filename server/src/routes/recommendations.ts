@@ -16,8 +16,8 @@ router.post("/", async (req: Request, res: Response) => {
   // Extract form data from the request body
   const { destinations, travelTime, budget, tripType, activities } = req.body;
 
-  // Create a prompt for the AI
-  const prompt = `You are a helpful travel planner assistant. Based on the following traveler preferences, provide three vacation destination recommendations:
+  // Updated prompt for detailed itinerary
+  const prompt = `You are a helpful travel planner assistant. Based on the following traveler preferences, provide a detailed day-by-day itinerary:
 
   Traveler Preferences:
   - Destinations: ${destinations || "No preference"}
@@ -26,22 +26,44 @@ router.post("/", async (req: Request, res: Response) => {
   - Trip Type: ${tripType}
   - Activities: ${activities}
   
-  For each recommendation, include:
-  1. The destination name.
-  2. A brief description of the destination.
-  3. An explanation of why it matches the traveler's preferences.
+  Please provide:
+  1. A brief overview of why this itinerary suits their preferences
+  2. A day-by-day breakdown including:
+     - Day number
+     - Locations to visit
+     - Activities and attractions
+     - Estimated time for each activity
+     - Transportation details between locations
+     - Estimated costs where relevant
   
-  Format your response as:
-  1. **Destination Name**
-     Description and explanation.
-  
-  2. **Destination Name**
-     Description and explanation.
-  
-  3. **Destination Name**
-     Description and explanation.
-  
-  Please ensure the recommendations are suitable based on the given budget and travel time.`;
+  Format your response as JSON:
+  {
+    "overview": "Brief explanation of the itinerary",
+    "dailyPlan": [
+      {
+        "day": 1,
+        "locations": ["Location names"],
+        "activities": [
+          {
+            "name": "Activity name",
+            "duration": "Estimated duration",
+            "cost": "Estimated cost",
+            "description": "Brief description",
+            "coordinates": [latitude, longitude]
+          }
+        ],
+        "transportation": {
+          "method": "Transportation method",
+          "duration": "Travel duration",
+          "cost": "Transportation cost"
+        },
+        "totalDayCost": "Total cost for the day"
+      }
+    ],
+    "totalCost": "Total trip cost estimate"
+  }
+
+  Ensure all costs are within the specified budget of ${budget} and activities match the preferred trip type and interests.`;
 
   try {
     // Make a request to the OpenAI API
@@ -50,40 +72,27 @@ router.post("/", async (req: Request, res: Response) => {
       messages: [
         {
           role: "system",
-          content: "You are a helpful travel planner assistant.",
+          content:
+            "You are a helpful travel planner assistant. Provide responses in valid JSON format.",
         },
         { role: "user", content: prompt },
       ],
-      max_tokens: 800,
+      max_tokens: 1500,
       temperature: 0.7,
     });
 
-    console.log("OpenAI response data:", aiResponse.data);
-    // Check if choices exist and have at least one item
-    if (!aiResponse.data.choices || aiResponse.data.choices.length === 0) {
-      console.error("No choices returned from OpenAI");
-      res
-        .status(500)
-        .json({ error: "No response choices returned from OpenAI" });
-      return;
-    }
-
-    // Extract and format the AI's response
+    // Parse the response
     const aiText = aiResponse.data.choices[0].message?.content;
     if (!aiText) {
-      console.error("No text returned from OpenAI");
-      res.status(500).json({ error: "No response from OpenAI" });
-      return; // Exit early since there's no valid text
+      throw new Error("No response from OpenAI");
     }
 
-    const recommendations = parseAIResponse(aiText);
-    res.json(recommendations);
+    // Parse JSON response
+    const itinerary = JSON.parse(aiText);
+    res.json(itinerary);
   } catch (error: any) {
-    console.error(
-      "Error generating recommendations:",
-      error.response?.data || error.message
-    );
-    res.status(500).json({ error: "Failed to generate recommendations" });
+    console.error("Error:", error);
+    res.status(500).json({ error: "Failed to generate itinerary" });
   }
 });
 
