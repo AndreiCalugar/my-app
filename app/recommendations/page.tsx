@@ -5,17 +5,22 @@ import { FormDataContext } from "../context/FormDataContext";
 import Link from "next/link";
 import Itinerary from "../components/Itinerary";
 
-interface Recommendation {
+interface Itinerary {
+  name: string;
   overview: string;
-  dailyPlan: any[]; // Update this type based on your actual data structure
+  dailyPlan: any[];
   totalCost: string;
+}
+
+interface Recommendations {
+  itineraries: Itinerary[];
 }
 
 export default function Recommendations() {
   const context = useContext(FormDataContext);
-  const [recommendations, setRecommendations] = useState<Recommendation | null>(
-    null
-  );
+  const [selectedItinerary, setSelectedItinerary] = useState(0);
+  const [recommendations, setRecommendations] =
+    useState<Recommendations | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,10 +48,7 @@ export default function Recommendations() {
         }
 
         const data = await response.json();
-        setRecommendations({
-          ...data,
-          totalCost: data.totalCost.toString(),
-        });
+        setRecommendations(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
@@ -61,7 +63,7 @@ export default function Recommendations() {
     <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 text-white p-8">
       {/* Header Section */}
       <h1 className="text-4xl sm:text-5xl font-bold mb-8 text-center">
-        Your Travel Recommendations
+        Your Travel Options
       </h1>
 
       {/* Loading State */}
@@ -81,11 +83,31 @@ export default function Recommendations() {
 
       {/* Recommendations Grid */}
       {!isLoading && !error && recommendations && (
-        <Itinerary
-          overview={recommendations.overview}
-          dailyPlan={recommendations.dailyPlan}
-          totalCost={recommendations.totalCost}
-        />
+        <div className="w-full max-w-7xl">
+          {/* Itinerary Selection */}
+          <div className="flex gap-4 mb-8 justify-center">
+            {recommendations.itineraries.map((itinerary, index) => (
+              <button
+                key={index}
+                onClick={() => setSelectedItinerary(index)}
+                className={`px-6 py-3 rounded-lg transition-all ${
+                  selectedItinerary === index
+                    ? "bg-white text-blue-600 shadow-lg"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
+                }`}
+              >
+                {itinerary.name}
+              </button>
+            ))}
+          </div>
+
+          {/* Selected Itinerary Display */}
+          <Itinerary
+            overview={recommendations.itineraries[selectedItinerary].overview}
+            dailyPlan={recommendations.itineraries[selectedItinerary].dailyPlan}
+            totalCost={recommendations.itineraries[selectedItinerary].totalCost}
+          />
+        </div>
       )}
 
       {/* Travel Tips Section */}

@@ -17,7 +17,7 @@ router.post("/", async (req: Request, res: Response) => {
   const { destinations, travelTime, budget, tripType, activities } = req.body;
 
   // Updated prompt for detailed itinerary
-  const prompt = `You are a helpful travel planner assistant. Based on the following traveler preferences, provide a detailed day-by-day itinerary:
+  const prompt = `You are a helpful travel planner assistant. Based on the following traveler preferences, provide TWO DIFFERENT detailed day-by-day itineraries:
 
   Traveler Preferences:
   - Destinations: ${destinations || "No preference"}
@@ -26,44 +26,52 @@ router.post("/", async (req: Request, res: Response) => {
   - Trip Type: ${tripType}
   - Activities: ${activities}
   
-  Please provide:
-  1. A brief overview of why this itinerary suits their preferences
-  2. A day-by-day breakdown including:
-     - Day number
-     - Locations to visit
-     - Activities and attractions
-     - Estimated time for each activity
-     - Transportation details between locations
-     - Estimated costs where relevant
-  
-  Format your response as JSON:
+  Please provide TWO distinctly different itineraries in JSON format. Each itinerary MUST include exactly ${travelTime} days in the dailyPlan array.
   {
-    "overview": "Brief explanation of the itinerary",
-    "dailyPlan": [
+    "itineraries": [
       {
-        "day": 1,
-        "locations": ["Location names"],
-        "activities": [
+        "name": "Option 1: [Compeling description of the itinerary enpasizing the theme and focus]",
+        "overview": "A compelling explanation of this itinerary option",
+        "dailyPlan": [
           {
-            "name": "Activity name",
-            "duration": "Estimated duration",
-            "cost": "Estimated cost",
-            "description": "Brief description",
-            "coordinates": [latitude, longitude]
+            "day": number (1 to ${travelTime}),
+            "locations": ["Location names"],
+            "activities": [
+              {
+                "name": "Activity name",
+                "duration": "Estimated duration",
+                "cost": "Estimated cost",
+                "description": "Compeling description",
+                "coordinates": [latitude, longitude]
+              }
+            ],
+            "transportation": {
+              "method": "Transportation method",
+              "duration": "Travel duration",
+              "cost": "Transportation cost"
+            },
+            "totalDayCost": "Total cost for the day"
           }
         ],
-        "transportation": {
-          "method": "Transportation method",
-          "duration": "Travel duration",
-          "cost": "Transportation cost"
-        },
-        "totalDayCost": "Total cost for the day"
+        "totalCost": "Total trip cost estimate"
+      },
+      {
+        "name": "Option 2: [Different theme/focus]",
+        "overview": "A compelling explanation of this itinerary option",
+        "dailyPlan": [Same structure as Option 1, with ${travelTime} days],
+        "totalCost": "Total trip cost estimate"
       }
-    ],
-    "totalCost": "Total trip cost estimate"
+    ]
   }
 
-  Ensure all costs are within the specified budget of ${budget} and activities match the preferred trip type and interests.`;
+  Important:
+  1. Each itinerary MUST have exactly ${travelTime} days in the dailyPlan array
+  2. Days MUST be numbered from 1 to ${travelTime}
+  3. Each day MUST have at least one activity
+  4. All coordinates MUST be valid [latitude, longitude] pairs
+  5. Make the two options distinctly different in focus/theme while meeting the preferences
+
+  Make sure to generate a complete day-by-day plan for both itineraries covering the entire ${travelTime}-day duration.`;
 
   try {
     // Make a request to the OpenAI API
@@ -73,11 +81,11 @@ router.post("/", async (req: Request, res: Response) => {
         {
           role: "system",
           content:
-            "You are a helpful travel planner assistant. Provide responses in valid JSON format.",
+            "You are a helpful travel planner assistant. Provide complete and detailed responses in valid JSON format.",
         },
         { role: "user", content: prompt },
       ],
-      max_tokens: 1500,
+      max_tokens: 3000,
       temperature: 0.7,
     });
 
@@ -88,11 +96,11 @@ router.post("/", async (req: Request, res: Response) => {
     }
 
     // Parse JSON response
-    const itinerary = JSON.parse(aiText);
-    res.json(itinerary);
+    const itineraries = JSON.parse(aiText);
+    res.json(itineraries);
   } catch (error: any) {
     console.error("Error:", error);
-    res.status(500).json({ error: "Failed to generate itinerary" });
+    res.status(500).json({ error: "Failed to generate itineraries" });
   }
 });
 
