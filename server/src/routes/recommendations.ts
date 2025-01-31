@@ -81,7 +81,7 @@ router.post("/", async (req: Request, res: Response) => {
         {
           role: "system",
           content:
-            "You are a helpful travel planner assistant. Provide complete and detailed responses in valid JSON format.",
+            "You are a helpful travel planner assistant. Provide responses in valid JSON format only, without any markdown formatting or backticks.",
         },
         { role: "user", content: prompt },
       ],
@@ -95,12 +95,31 @@ router.post("/", async (req: Request, res: Response) => {
       throw new Error("No response from OpenAI");
     }
 
-    // Parse JSON response
-    const itineraries = JSON.parse(aiText);
-    res.json(itineraries);
+    // Clean up the response text before parsing
+    const cleanedText = aiText
+      .trim()
+      .replace(/^```json\s*/, "") // Remove leading ```json
+      .replace(/\s*```$/, "") // Remove trailing ```
+      .replace(/^\s*`/, "") // Remove any leading backtick
+      .replace(/`\s*$/, ""); // Remove any trailing backtick
+
+    try {
+      const itineraries = JSON.parse(cleanedText);
+      res.json(itineraries);
+    } catch (parseError) {
+      console.error("JSON Parse Error:", parseError);
+      console.error("Cleaned Text:", cleanedText);
+      res.status(500).json({
+        error: "Failed to parse itineraries",
+        details: "Invalid JSON format received from AI",
+      });
+    }
   } catch (error: any) {
     console.error("Error:", error);
-    res.status(500).json({ error: "Failed to generate itineraries" });
+    res.status(500).json({
+      error: "Failed to generate itineraries",
+      details: error.message,
+    });
   }
 });
 
