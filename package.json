@@ -15,11 +15,13 @@
     "axios": "^1.7.9",
     "leaflet": "^1.9.4",
     "next": "15.1.6",
+    "node-fetch": "^3.3.2",
     "openai": "^4.80.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
-    "react-leaflet": "^5.0.0"
+    "react-leaflet": "^5.0.0",
+    "unsplash-js": "^7.0.19"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -2,6 +2,7 @@
 
 import { Router, Request, Response } from "express";
 import { Configuration, OpenAIApi } from "openai";
+import { getLocationImage } from "../services/unsplash";
 
 const router = Router();
 
@@ -105,6 +106,29 @@ router.post("/", async (req: Request, res: Response) => {
 
     try {
       const itineraries = JSON.parse(cleanedText);
+
+      // Process both itineraries
+      for (const itinerary of itineraries.itineraries) {
+        for (const day of itinerary.dailyPlan) {
+          try {
+            // Get image for the first location of each day
+            if (day.locations && day.locations.length > 0) {
+              console.log(`Processing images for day ${day.day}`); // Debug log
+              const locationImage = await getLocationImage(
+                `${day.locations[0]} ${destinations}`
+              );
+              day.image = locationImage;
+            }
+          } catch (imageError) {
+            console.error(
+              `Error processing image for day ${day.day}:`,
+              imageError
+            );
+            // Continue with the loop even if one image fails
+          }
+        }
+      }
+
       res.json(itineraries);
     } catch (parseError) {
       console.error("JSON Parse Error:", parseError);

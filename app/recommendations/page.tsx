@@ -33,7 +33,7 @@ export default function Recommendations() {
     const fetchRecommendations = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/recommendations",
+          "http://localhost:5001/api/recommendations",
           {
             method: "POST",
             headers: {

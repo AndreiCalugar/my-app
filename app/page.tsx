@@ -84,11 +84,12 @@ export default function Home() {
         <div className="relative h-[400px] rounded-xl overflow-hidden shadow-2xl group">
           {/* Current Image */}
           <Image
-            src={images[currentImageIndex].src}
-            alt={images[currentImageIndex].alt}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-110"
-            priority
+            src="/world-map.jpeg"
+            alt="World Map"
+            width={1920}
+            height={1080}
+            priority={true}
+            className="absolute inset-0 object-cover w-full h-full"
           />
 
           {/* Image Overlay with Text */}
