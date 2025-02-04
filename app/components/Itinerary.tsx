@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Map from "@/app/components/Map";
+import HotelRecommendations from "@/app/components/HotelRecommendations";
+import { HotelOffer } from "../../server/src/types/hotel";
 
 interface Activity {
   name: string;
@@ -28,6 +30,7 @@ interface DailyPlan {
       link: string;
     };
   };
+  hotels?: HotelOffer[];
 }
 
 interface ItineraryProps {
@@ -45,6 +48,7 @@ export default function Itinerary({
   const [imagesLoaded, setImagesLoaded] = useState<{ [key: number]: boolean }>(
     {}
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   // Get all markers for the selected day
   const currentDayMarkers =
@@ -189,6 +193,16 @@ export default function Itinerary({
         <div className="h-[600px] rounded-lg overflow-hidden shadow-lg">
           <Map markers={currentDayMarkers} />
         </div>
+      </div>
+
+      {/* Hotel Recommendations */}
+      <div className="px-8">
+        <HotelRecommendations
+          hotels={
+            dailyPlan.find((day) => day.day === selectedDay)?.hotels || []
+          }
+          isLoading={isLoading}
+        />
       </div>
 
       {/* Full-width image section */}

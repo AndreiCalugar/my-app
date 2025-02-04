@@ -3,6 +3,7 @@
 import { Router, Request, Response } from "express";
 import { Configuration, OpenAIApi } from "openai";
 import { getLocationImage } from "../services/unsplash";
+import { getHotelRecommendations } from "../services/booking";
 
 const router = Router();
 
@@ -118,6 +119,21 @@ router.post("/", async (req: Request, res: Response) => {
                 `${day.locations[0]} ${destinations}`
               );
               day.image = locationImage;
+
+              // Get hotel recommendations
+              const checkInDate = new Date().toISOString().split("T")[0]; // Today
+              const checkOutDate = new Date(Date.now() + 24 * 60 * 60 * 1000)
+                .toISOString()
+                .split("T")[0]; // Tomorrow
+
+              console.log(`Fetching hotels for ${day.locations[0]}`);
+              const hotels = await getHotelRecommendations(
+                day.locations[0],
+                parseFloat(budget),
+                checkInDate,
+                checkOutDate
+              );
+              day.hotels = hotels;
             }
           } catch (imageError) {
             console.error(
