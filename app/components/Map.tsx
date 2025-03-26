@@ -1,39 +1,6 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import { Icon, LatLngBounds, LatLng } from "leaflet";
-import { useEffect } from "react";
-
-// Fix for the marker icon in Next.js
-const defaultIcon = new Icon({
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-});
-
-// Component to handle map bounds
-function MapBounds({ markers }: { markers: Marker[] }) {
-  const map = useMap();
-
-  useEffect(() => {
-    if (markers.length > 0) {
-      const bounds = new LatLngBounds([]);
-      markers.forEach((marker) => {
-        bounds.extend(new LatLng(marker.position[0], marker.position[1]));
-      });
-
-      map.fitBounds(bounds, {
-        padding: [50, 50],
-        maxZoom: 13,
-      });
-    }
-  }, [markers, map]);
-
-  return null;
-}
+import { useEffect, useRef } from "react";
 
 interface Marker {
   position: [number, number];
@@ -47,41 +14,106 @@ interface MapProps {
 }
 
 export default function Map({ markers }: MapProps) {
-  const defaultCenter: [number, number] = [0, 0];
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstance = useRef<google.maps.Map | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
+
+  async function initMap() {
+    if (!mapRef.current) return;
+
+    try {
+      // Request needed libraries
+      const { Map } = (await google.maps.importLibrary(
+        "maps"
+      )) as google.maps.MapsLibrary;
+      const { Marker } = (await google.maps.importLibrary(
+        "marker"
+      )) as google.maps.MarkerLibrary;
+
+      // Initialize the map
+      mapInstance.current = new Map(mapRef.current, {
+        zoom: 1,
+        center: { lat: 0, lng: 0 },
+        mapId: process.env.NEXT_PUBLIC_GOOGLE_MAP_ID,
+      });
+
+      // Clear existing markers
+      markersRef.current.forEach((marker) => marker.setMap(null));
+      markersRef.current = [];
+
+      if (markers.length > 0) {
+        const bounds = new google.maps.LatLngBounds();
+
+        // Add markers
+        markers.forEach((markerData) => {
+          const marker = new Marker({
+            position: {
+              lat: markerData.position[0],
+              lng: markerData.position[1],
+            },
+            map: mapInstance.current,
+            title: markerData.title,
+          });
+
+          const infoWindow = new google.maps.InfoWindow({
+            content: `
+              <div class="p-2">
+                <h3 class="font-bold text-lg mb-1">Day ${markerData.day}</h3>
+                <h4 class="font-semibold">${markerData.title}</h4>
+                <p class="text-sm mt-1">${markerData.description}</p>
+              </div>
+            `,
+          });
+
+          marker.addListener("click", () => {
+            infoWindow.open(mapInstance.current, marker);
+          });
+
+          markersRef.current.push(marker);
+          bounds.extend(marker.getPosition() as google.maps.LatLng);
+        });
+
+        // Fit map to markers
+        mapInstance.current.fitBounds(bounds, {
+          top: 50,
+          right: 50,
+          bottom: 50,
+          left: 50,
+        });
+      }
+    } catch (error) {
+      console.error("Error initializing map:", error);
+    }
+  }
 
   useEffect(() => {
-    // Fix for the marker icon in Next.js
-    delete (Icon.Default.prototype as any)._getIconUrl;
-    Icon.Default.mergeOptions({
-      iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-      shadowUrl:
-        "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-    });
-  }, []);
+    console.log("API Key:", process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    if (!apiKey) {
+      console.error("Google Maps API key is missing");
+      return;
+    }
 
-  return (
-    <MapContainer
-      center={defaultCenter}
-      zoom={2}
-      scrollWheelZoom={true}
-      style={{ height: "100%", width: "100%" }}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {markers.map((marker, index) => (
-        <Marker key={index} position={marker.position} icon={defaultIcon}>
-          <Popup>
-            <div className="p-2">
-              <h3 className="font-bold text-lg mb-1">Day {marker.day}</h3>
-              <h4 className="font-semibold">{marker.title}</h4>
-              <p className="text-sm mt-1">{marker.description}</p>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-      <MapBounds markers={markers} />
-    </MapContainer>
-  );
+    // Load the Google Maps script
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&v=beta`;
+    script.defer = true;
+    script.async = true;
+
+    window.initMap = initMap;
+    script.onload = () => {
+      initMap();
+    };
+
+    document.head.appendChild(script);
+
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+      delete window.initMap;
+    };
+  }, [markers]);
+
+  return <div ref={mapRef} className="w-full h-full rounded-lg" />;
 }

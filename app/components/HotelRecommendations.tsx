@@ -19,28 +19,32 @@ export default function HotelRecommendations({
 
   return (
     <div className="my-8">
-      <h3 className="text-2xl font-bold mb-4">Recommended Hotels</h3>
+      <h3 className="text-2xl font-bold mb-4 text-gray-800">
+        Recommended Hotels
+      </h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {hotels.slice(0, 3).map((hotel) => (
           <div
             key={hotel.hotel_id}
-            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full"
           >
             <img
               src={hotel.image_url || "/hotel-placeholder.jpg"}
               alt={hotel.name}
               className="w-full h-48 object-cover"
             />
-            <div className="p-4">
-              <h4 className="font-bold text-lg mb-2">{hotel.name}</h4>
+            <div className="p-4 flex flex-col flex-grow">
+              <h4 className="font-bold text-lg mb-2 text-gray-800">
+                {hotel.name}
+              </h4>
               <div className="flex items-center mb-2">
                 <span className="text-yellow-500 mr-1">★</span>
-                <span>{hotel.rating}/5</span>
-                <span className="ml-auto font-bold">
-                  ${hotel.price_per_night}/night
+                <span className="text-gray-700">{hotel.rating}/5</span>
+                <span className="ml-auto font-bold text-gray-800">
+                  {hotel.price_per_night}
                 </span>
               </div>
-              <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+              <p className="text-gray-600 text-sm mb-4 line-clamp-2 flex-grow">
                 {hotel.description}
               </p>
               <div className="flex flex-wrap gap-2 mb-4">
@@ -57,7 +61,7 @@ export default function HotelRecommendations({
                 href={hotel.booking_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block w-full text-center bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition-colors"
+                className="block w-full text-center bg-blue-700 text-white py-2 rounded hover:bg-blue-800 transition-colors mt-auto"
               >
                 Book Now
               </a>

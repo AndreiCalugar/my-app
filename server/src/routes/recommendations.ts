@@ -28,34 +28,34 @@ router.post("/", async (req: Request, res: Response) => {
   - Trip Type: ${tripType}
   - Activities: ${activities}
   
-  Please provide TWO distinctly different itineraries in JSON format. Each itinerary MUST include exactly ${travelTime} days in the dailyPlan array.
+  Please provide TWO distinctly different itineraries in JSON format. Each itinerary MUST include exactly ${travelTime} days in the dailyPlan array, with AT LEAST TWO different locations/attractions to visit per day.
   {
     "itineraries": [
       {
-        "name": "Option 1: [Compeling description of the itinerary enpasizing the theme and focus]",
+        "name": "Option 1: [Compelling description of the itinerary emphasizing the theme and focus]",
         "overview": "A compelling explanation of this itinerary option",
         "dailyPlan": [
           {
             "day": number (1 to ${travelTime}),
-            "locations": ["Location names"],
+            "locations": ["At least 2 location names per day"],
             "activities": [
               {
                 "name": "Activity name",
                 "duration": "Estimated duration",
                 "cost": "Estimated cost",
-                "description": "Compeling description",
+                "description": "Compelling description",
                 "coordinates": [latitude, longitude]
               }
             ],
             "transportation": {
-              "method": "Transportation method",
-              "duration": "Travel duration",
-              "cost": "Transportation cost"
+              "method": "string",
+              "duration": "string",
+              "cost": "string"
             },
-            "totalDayCost": "Total cost for the day"
+            "totalDayCost": "string"
           }
         ],
-        "totalCost": "Total trip cost estimate"
+        "totalCost": "string"
       },
       {
         "name": "Option 2: [Different theme/focus]",
@@ -66,14 +66,7 @@ router.post("/", async (req: Request, res: Response) => {
     ]
   }
 
-  Important:
-  1. Each itinerary MUST have exactly ${travelTime} days in the dailyPlan array
-  2. Days MUST be numbered from 1 to ${travelTime}
-  3. Each day MUST have at least one activity
-  4. All coordinates MUST be valid [latitude, longitude] pairs
-  5. Make the two options distinctly different in focus/theme while meeting the preferences
-
-  Make sure to generate a complete day-by-day plan for both itineraries covering the entire ${travelTime}-day duration.`;
+  Ensure each day has multiple attractions or points of interest to create a rich, engaging experience.`;
 
   try {
     // Make a request to the OpenAI API
