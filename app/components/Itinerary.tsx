@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import Map from "@/app/components/Map";
-import HotelRecommendations from "@/app/components/HotelRecommendations";
-import { HotelOffer } from "../../server/src/types/hotel";
 
 interface Activity {
   name: string;
@@ -30,7 +28,6 @@ interface DailyPlan {
       link: string;
     };
   };
-  hotels?: HotelOffer[];
 }
 
 interface ItineraryProps {
@@ -48,7 +45,6 @@ export default function Itinerary({
   const [imagesLoaded, setImagesLoaded] = useState<{ [key: number]: boolean }>(
     {}
   );
-  const [isLoading, setIsLoading] = useState(false);
 
   // Get all markers for the selected day
   const currentDayMarkers =
@@ -70,7 +66,7 @@ export default function Itinerary({
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-4 md:p-8">
         {/* Day Selection and Details */}
         <div className="space-y-8">
           {/* Day Selector - Updated styling */}
@@ -189,20 +185,10 @@ export default function Itinerary({
             ))}
         </div>
 
-        {/* Map */}
-        <div className="h-[600px] rounded-lg overflow-hidden shadow-lg">
+        {/* Map - responsive height */}
+        <div className="h-[400px] md:h-[500px] lg:h-[600px] rounded-lg overflow-hidden shadow-lg">
           <Map markers={currentDayMarkers} />
         </div>
-      </div>
-
-      {/* Hotel Recommendations */}
-      <div className="px-8">
-        <HotelRecommendations
-          hotels={
-            dailyPlan.find((day) => day.day === selectedDay)?.hotels || []
-          }
-          isLoading={isLoading}
-        />
       </div>
 
       {/* Full-width image section */}

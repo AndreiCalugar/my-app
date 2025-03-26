@@ -28,27 +28,33 @@ export default function HotelRecommendations({
             key={hotel.hotel_id}
             className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full"
           >
-            <img
-              src={hotel.image_url || "/hotel-placeholder.jpg"}
-              alt={hotel.name}
-              className="w-full h-48 object-cover"
-            />
+            <div className="relative h-48">
+              <img
+                src={
+                  hotel.image_url ||
+                  "https://source.unsplash.com/random/800x600/?luxury+hotel"
+                }
+                alt={hotel.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src =
+                    "https://source.unsplash.com/random/800x600/?luxury+hotel";
+                }}
+              />
+              <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded-full text-sm font-bold text-blue-700">
+                {hotel.rating}/5
+              </div>
+            </div>
             <div className="p-4 flex flex-col flex-grow">
-              <h4 className="font-bold text-lg mb-2 text-gray-800">
+              <h4 className="font-bold text-lg mb-1 text-gray-800">
                 {hotel.name}
               </h4>
-              <div className="flex items-center mb-2">
-                <span className="text-yellow-500 mr-1">★</span>
-                <span className="text-gray-700">{hotel.rating}/5</span>
-                <span className="ml-auto font-bold text-gray-800">
-                  {hotel.price_per_night}
-                </span>
-              </div>
-              <p className="text-gray-600 text-sm mb-4 line-clamp-2 flex-grow">
+              <p className="text-gray-500 text-sm mb-2">{hotel.city}</p>
+              <p className="text-gray-600 text-sm mb-3 line-clamp-2 flex-grow">
                 {hotel.description}
               </p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {hotel.amenities.slice(0, 3).map((amenity, index) => (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {hotel.amenities.map((amenity, index) => (
                   <span
                     key={index}
                     className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
@@ -56,6 +62,11 @@ export default function HotelRecommendations({
                     {amenity}
                   </span>
                 ))}
+              </div>
+              <div className="flex justify-between items-center mb-3">
+                <span className="font-bold text-gray-800">
+                  {hotel.price_per_night}
+                </span>
               </div>
               <a
                 href={hotel.booking_url}
